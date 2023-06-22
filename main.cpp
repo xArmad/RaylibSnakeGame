@@ -3,41 +3,73 @@
 
 using namespace std;
 
-int main () {
+Color green = {173, 204, 96, 255};
+Color darkGreen = {43, 51, 24, 255};
 
-    const int screenWidth = 800;
-    const int screenHeight = 600;
-    int ball_x = 100;
-    int ball_y = 100;
-    int ball_speed_x = 5;
-    int ball_speed_y = 5;
-    int ball_radius = 15;
+const int cellSize = 30;
+const int cellCount = 25;
 
-    cout << "Hello World" << endl;
+const int dimensions = cellSize * cellCount;
 
-    InitWindow(screenWidth, screenHeight, "My first RAYLIB program!");
+class Food {
+public:
+    Vector2 pos;
+    Texture2D texture;
+
+    Food()
+    {
+        Image image = LoadImage("Graphics/food.png");
+        texture = LoadTextureFromImage(image);
+        UnloadImage(image);
+        pos = GenerateRandomPos();
+    }
+
+    ~Food()
+    {
+        UnloadTexture(texture);
+    }
+
+    Vector2 GenerateRandomPos()
+    {
+        int x = GetRandomValue(0, cellCount - 1);
+        int y = GetRandomValue(0, cellCount - 1);
+
+        return { static_cast<float>(x), static_cast<float>(y) };
+    }
+
+    void Draw()
+    {
+        DrawTexture(texture, static_cast<int>(pos.x * cellSize), static_cast<int>(pos.y * cellSize), WHITE);
+    }
+};
+
+void UpdateGame(Food&);
+
+int main()
+{
+    InitWindow(dimensions, dimensions, "Snake Game");
     SetTargetFPS(60);
 
-    while (WindowShouldClose() == false){
-        BeginDrawing();
-        ClearBackground(BLACK);
-        ball_x += ball_speed_x;
-        ball_y += ball_speed_y;
+    Food food;
 
-        if(ball_x + ball_radius >= screenWidth  || ball_x - ball_radius <= 0)
-        {
-            ball_speed_x *= -1;
-        }
-
-        if(ball_y + ball_radius >= screenHeight  || ball_y - ball_radius <= 0)
-        {
-            ball_speed_y *= -1;
-        }
-
-        DrawCircle(ball_x,ball_y,ball_radius, WHITE);
-        EndDrawing();
+    while (!WindowShouldClose())
+    {
+        UpdateGame(food);
     }
 
     CloseWindow();
+
     return 0;
+}
+
+void UpdateGame(Food& food)
+{
+    BeginDrawing();
+
+    ClearBackground(green);
+
+    food.Draw();
+    DrawText("This is TEXT", 50, 50, 20, RED);
+
+    EndDrawing();
 }
